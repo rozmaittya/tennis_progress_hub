@@ -1,0 +1,46 @@
+[33mcommit 948b2f5abe27169a1d019259d4e51bcbbc8a55c3[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmaster[m[33m, [m[1;31morigin/master[m[33m)[m
+Merge: aee6031 1564dad
+Author: FetFrumos <fet@frumos.com>
+Date:   Tue Nov 18 22:24:32 2025 +0200
+
+    Merge remote-tracking branch 'origin/master'
+
+[33mcommit aee60315811e53dcf585e88e5d1af0a81767f372[m
+Merge: e6d45d7 4e93e8e
+Author: FetFrumos <fet@frumos.com>
+Date:   Wed Nov 12 13:57:01 2025 +0200
+
+    goals screen
+
+[33mcommit 1564dadbcce93c344f7db9f5acdb9ec3f116b795[m
+Merge: e6d45d7 4e93e8e
+Author: FetFrumos <fet@frumos.com>
+Date:   Wed Nov 12 13:57:01 2025 +0200
+
+    gradient background class
+
+[33mcommit e6d45d7b64b4dbcd2eaf37aff16671c0711f78ad[m
+Merge: 9417f5c 41fa620
+Author: FetFrumos <fet@frumos.com>
+Date:   Sun Nov 9 16:04:21 2025 +0200
+
+    gradient background class
+
+[33mcommit 4e93e8e84c17bd1868c161920a6c6810ec069f15[m
+Merge: 9417f5c 41fa620
+Author: FetFrumos <fet@frumos.com>
+Date:   Sun Nov 9 16:04:21 2025 +0200
+
+    Finish merge
+
+[33mcommit 9417f5cfe019aa1ea78f4a736c8e5733072c56b7[m
+Author: FetFrumos <fet@frumos.com>
+Date:   Sat Nov 8 21:00:06 2025 +0200
+
+    Work version with Database functionality and gradient background after reinstalling Android Studio
+
+[33mcommit 41fa62006f5c182722fddc2c0075fae169790d51[m
+Author: FetFrumos <fet@frumos.com>
+Date:   Sat Nov 8 21:00:06 2025 +0200
+
+    Work version with Database functionality and gradient background after reinstalling Android Studio
