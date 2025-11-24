@@ -16,14 +16,15 @@ class AppDatabase {
 
       db = await openDatabase(
         path,
-        version: 2, // Erhöhe die Version bei Datenbankänderungen
+        version: 3, // Erhöhe die Version bei Datenbankänderungen
         onCreate: _onCreate,
-        //onUpgrade: _onUpgrade,
+        onUpgrade: _onUpgrade,
       );
     }
 
   }
 
+  //creating database
   Future<void> _onCreate(Database db, int version) async {
     await db.execute('''
       CREATE TABLE progress_area (
@@ -45,16 +46,34 @@ class AppDatabase {
     ''');
   }
 
-//ДОДАТИ ЦІ ТРИ УНІВЕРСАЛЬНИХ МЕТОДА
-  Future<void> insert(String tableName, Map<String, dynamic> values) async {
+  //upgrade database adding table "goals"
+  Future<void> _onUpgrade(Database db, int oldVersion, int newVersion) async {
+    if(oldVersion<3) {
+      await db.execute('''
+      CREATE TABLE goals (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      item_id INTEGER NOT NULL,
+      is_checked INTEGER NOT NULL DEFAULT 0,
+      FOREIGN KEY (item_id) REFERENCES progress_item(id)
+          ON DELETE CASCADE
+          ON UPDATE CASCADE 
+      )
+      ''');
+    }
+  }
+
+  //universal insert function
+  Future<void> insertElement(String tableName, Map<String, dynamic> values) async {
     await db!.insert(tableName, values);
   }
 
+  //universal select function
   Future<List<Map<String, dynamic>>> getAll(String tableName,
       {String? where, List<Object?>? whereArgs}) async {
     return await db!.query(tableName, where: where, whereArgs: whereArgs);
   }
 
+  //universal toggle function
   Future<void> updateChecked(String tableName, int id, bool isChecked) async {
     await db!.update(
       tableName,
@@ -63,7 +82,7 @@ class AppDatabase {
       whereArgs: [id],
     );
   }
-
+ //universal update name function
   Future<void> updateName(String tableName, int id, String newName) async {
     await db!.update(
         tableName,
@@ -73,26 +92,17 @@ class AppDatabase {
     );
   }
 
-
-  Future<void> updateStatus(String tableName,int id, bool isChecked) async {
-    //final db = await database;
+  Future<void> updateGoal(int id, int item_id) async {
     await db!.update(
-      tableName,
-      {'is_checked': isChecked ? 1 : 0},
-      where: 'id = ?',
-      whereArgs: [id],
+    'goals',
+    {'item_id': item_id},
+        where: 'id = ?',
+        whereArgs: [id],
     );
   }
-
-  Future<List<Map<String, dynamic>>> getAreas() async {
-    //final db = await database;
-    final result =  await db!.query('progress_area');
-    return result;
-  }
-  Future<List<Map<String, dynamic>>> getItems() async {
-    //final db = await database;
-    final result =  await db!.query('progress_item');
-    return result;
+  //universal delete function
+  Future<void> deleteElement(String tableName, {String? where, List<Object?>? whereArgs}) async {
+    await db!.delete(tableName, where: where, whereArgs: whereArgs);
   }
 
   Future<void> close() async {
@@ -117,5 +127,21 @@ class AppDatabase {
       return result;
     }
 
+    Future<List<Map<String, dynamic>>> getGoalsWithAreaItemName() async {
+    final result = await db!.rawQuery('''
+    SELECT 
+      goals.id,
+      progress_area.name AS area_name,
+      progress_item.name AS item_name,
+      goals.is_checked
+    FROM goals
+    INNER JOIN progress_item
+      ON goals.item_id = progress_item.id
+    INNER JOIN progress_area
+      ON progress_item.area_id = progress_area.id
+    WHERE goals.is_checked = 0
+    ''');
 
+    return result;
+    }
 }

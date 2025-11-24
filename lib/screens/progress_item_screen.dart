@@ -47,10 +47,10 @@ class _ProgressItemScreenState extends ConsumerState<ProgressItemScreen> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text('Add new element'),
+          title: const Text('Add new skill'),
           content: TextField(
             autofocus: true,
-            decoration: const InputDecoration(hintText: 'Input new element'),
+            decoration: const InputDecoration(hintText: 'Input new skill name'),
             onChanged: (value) => itemName = value,
           ),
           actions: [
@@ -88,11 +88,15 @@ class _ProgressItemScreenState extends ConsumerState<ProgressItemScreen> {
   Widget build(BuildContext context) {
     final items = ref.watch(progressItemsProvider(widget.areaId));
     return GradientBackground(
-      colors: [Colors.greenAccent, Colors.orange],
+      colors: [Colors.teal, Colors.orange],
       child: Scaffold(
         backgroundColor: Colors.transparent,
         appBar: AppBar(
-            title: Text(widget.areaName),
+            title: Text(widget.areaName, style: TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 18,
+              color: Colors.black87,
+            ),),
             backgroundColor: Colors.transparent,
         ),
         body: ListView.builder(
@@ -100,7 +104,12 @@ class _ProgressItemScreenState extends ConsumerState<ProgressItemScreen> {
           itemBuilder: (context, index) {
             final item = items[index];
             return ListTile(
-              title: Text(item['name']),
+              title: Text(item['name'],
+              style: TextStyle(shadows: [
+                Shadow(offset: Offset(0.5, 0.5),
+                blurRadius: 1.0,
+                color: Colors.black26,)
+              ]),),
               trailing: Checkbox(
                 value: item['is_checked'] == 1,
                 onChanged: (bool? value) {

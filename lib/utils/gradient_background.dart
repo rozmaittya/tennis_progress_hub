@@ -7,7 +7,7 @@ class GradientBackground extends StatelessWidget {
   const GradientBackground({
     super.key,
     required this.child,
-    this.colors = const [Colors.greenAccent, Colors.blueAccent]
+    this.colors = const [Colors.white70, Colors.orange]
   });
 
   @override

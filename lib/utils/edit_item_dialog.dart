@@ -16,7 +16,7 @@ Future<void> editItemDialog({
     context: context,
     builder: (BuildContext context) {
       return AlertDialog(
-        title: const Text('Edit name'),
+        title: Text(tableName == 'progress_item' ? 'Edit skill' :'Edit name'),
         content: TextField(
           autofocus: true,
           controller: TextEditingController(text: currentName),

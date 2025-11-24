@@ -96,6 +96,7 @@ class _ProgressAreasScreenState extends ConsumerState<ProgressAreasScreen> {
                   ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(content: Text('Name can\'t be empty')),
                   );
+
                 }
               },
               child: const Text('Додати'),
@@ -117,24 +118,16 @@ class _ProgressAreasScreenState extends ConsumerState<ProgressAreasScreen> {
      return  Scaffold(
        backgroundColor: Colors.transparent,
        body:
-
-       // GradientBackground(
-    //     child: Scaffold(
-    //   backgroundColor: Colors.transparent,
-    //   appBar: AppBar(
-    //     //title: const Text('Progress areas'),
-    //     backgroundColor: Colors.transparent,
-    //     elevation: 0,
-    //   ),
-    //   body:
-
        ListView.builder(
         itemCount: items.length,
         itemBuilder: (context, index) {
           final item = items[index];
           return ListTile(
             leading: Icon(Icons.sports_tennis),
-            title: Text(item['name']),
+            title: Text(item['name'], style:
+              TextStyle(
+                fontWeight: FontWeight.bold,
+              ),),
             //we don't need the option for progress areas now
             // trailing: Checkbox(
             //   value: item['is_checked'] == 1,

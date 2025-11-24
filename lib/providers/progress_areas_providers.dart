@@ -26,13 +26,13 @@ class ProgressAreasNotifier extends StateNotifier<List<Map<String, dynamic>>> {
 Future<void> loadAreas() async {
   if(db == null) return;
 
-  final areas = await db!.getAreas();
+  final areas = await db!.getAll('progress_area');
   state = areas;
 }
 
 Future<void> addArea(String name) async {
     if(db == null) return;
-  await db?.insert('progress_area', {'name': name, 'is_checked': 0});
+  await db?.insertElement('progress_area', {'name': name, 'is_checked': 0});
     await loadAreas();
 }
 

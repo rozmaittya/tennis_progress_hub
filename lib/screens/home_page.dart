@@ -20,12 +20,14 @@ class HomePage extends ConsumerWidget {
           backgroundColor: Colors.transparent,
           appBar: AppBar(
             backgroundColor: Colors.transparent,
-            title: Text(currentScreen.title ?? 'Main'),
+            title: Text(currentScreen.title ?? 'Main', style: TextStyle(
+              fontSize: 16,
+            ),),
             leading: IconButton(
                 onPressed: () {
                   ref.read(currentScreenProvider.notifier).state = ScreenData(
                       title: 'Tennis hub',
-                      screen: const Center(child: Text('Let\'s progress!\nAdd new skills\nor choose 1-3 goals\nfor game or training',)),
+                      screen: const Center(child: Text('Let\'s progress!\n\nAdd new skills\nor mark 1-3 goals\nfor game or training',)),
                   );
                   },
                 icon: Icon(Icons.home)),
@@ -35,7 +37,7 @@ class HomePage extends ConsumerWidget {
                 tooltip: 'Progress ares/Tennis skills',  
                 onPressed: () {
                   ref.read(currentScreenProvider.notifier).state = ScreenData(
-                      title: 'Progress areas',
+                      title: 'Skills groups',
                       screen: const ProgressAreasScreen(),
                   );
                   },
@@ -45,10 +47,15 @@ class HomePage extends ConsumerWidget {
                 tooltip: 'game/training goals',
                 onPressed: () {
                   ref.read(currentScreenProvider.notifier).state = ScreenData(
-                      title: 'Goals for game/training',
+                      title: 'Game goals',
                       screen: const GoalsScreen(),
                   );
                 }, ),
+              IconButton(
+                  onPressed: () {
+
+              },
+                  icon: Icon(Icons.accessibility_new)),
             ],
           ),
           body: currentScreen.screen,

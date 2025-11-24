@@ -25,7 +25,32 @@ class GoalsNotifier extends StateNotifier<List<Map<String, dynamic>>> {
 Future<void> loadGoals() async {
     if(db == null) return;
 
-    final result = await db!.getCheckedItemsWithAreaName();
+    final result = await db!.getGoalsWithAreaItemName();
     state = result;
+}
+
+Future<void> addGoal(int item_id) async {
+    if(db == null) return;
+
+    await db!.insertElement('goals', {'item_id': item_id, 'is_checked': 0});
+    await loadGoals();
+}
+
+Future<void> updateGoal(int id, int item_id) async {
+    if(db == null) return;
+
+    await db!.updateGoal(id, item_id);
+}
+
+Future<void> toggleGoal(int id, bool isChecked) async {
+    if(db == null) return;
+
+    await db!.updateChecked('goals', id, isChecked);
+}
+
+Future<void> deleteGoal(int id) async {
+    if(db == null) return;
+
+    await db!.deleteElement('goals', where: 'id = ?', whereArgs: [id],);
 }
 }

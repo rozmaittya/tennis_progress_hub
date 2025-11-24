@@ -33,23 +33,28 @@ Future<void> loadItems() async {
 
 Future<void> addItem(int areaId, String name) async {
   if(db == null) return;
-  await db!.insert('progress_item', {
+  await db!.insertElement('progress_item', {
     'area_id': areaId,
     'name': name,
-    'is_checked': 0,
-  });
+    'is_checked': 0},
+  );
   await loadItems();
 }
 
 Future<void> toggleItem(int id, bool isChecked) async {
   if(db == null) return;
-  await db!.updateStatus('progress_item', id, isChecked);
+  await db!.updateChecked('progress_item', id, isChecked);
   await loadItems();
 }
 
 Future<void> editItem(int id, String newName) async {
     if(db == null) return;
-    await db!.updateName('progress_items', id, newName);
+    await db!.updateName('progress_item', id, newName);
     await loadItems();
+}
+
+Future<void> deleteItem(int id) async {
+    if(db == null) return;
+    await db!.deleteElement('progress_item', where: 'id = ?', whereArgs: [id],);
 }
 }

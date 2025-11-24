@@ -1,6 +1,8 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/material.dart';
+import 'package:progress_hub_2/utils/gradient_background.dart';
 import '../providers/goals_providers.dart';
+import '../widgets/tennis_ball_button.dart';
 
 class GoalsScreen extends ConsumerWidget {
   const GoalsScreen({super.key});
@@ -9,11 +11,14 @@ class GoalsScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final goals = ref.watch(goalsProvider);
 
-    if(goals.isEmpty) {
-      return const Center(child: Text('No checked goals.\nGo to Progress areas \nand mark the required skiils \nas goals'),);
-    }
+    // if(goals.isEmpty) {
+    //   return const Center(child: Text('No checked goals.\nGo to Progress areas \nand mark the required skiils \nas goals'),);
+    // }
 
-    return ListView.builder(
+    return Scaffold(
+          backgroundColor: Colors.transparent,
+          body:
+        ListView.builder(
       itemCount: goals.length,
         itemBuilder: (context, index) {
         final goal = goals[index];
@@ -40,6 +45,11 @@ class GoalsScreen extends ConsumerWidget {
           ],)
         );
 
-        });
+        }),
+    floatingActionButton: TennisBallButton(onPressed: () {
+
+    }
+    ),
+    );
   }
 }
