@@ -88,7 +88,7 @@ class _ProgressItemScreenState extends ConsumerState<ProgressItemScreen> {
   Widget build(BuildContext context) {
     final items = ref.watch(progressItemsProvider(widget.areaId));
     return GradientBackground(
-      colors: [Colors.teal, Colors.orange],
+     // colors: [Colors.teal, Colors.orange],
       child: Scaffold(
         backgroundColor: Colors.transparent,
         appBar: AppBar(

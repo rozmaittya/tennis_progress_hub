@@ -27,7 +27,7 @@ class HomePage extends ConsumerWidget {
                 onPressed: () {
                   ref.read(currentScreenProvider.notifier).state = ScreenData(
                       title: 'Tennis hub',
-                      screen: const Center(child: Text('Let\'s progress!\n\nAdd new skills\nor mark 1-3 goals\nfor game or training',)),
+                      screen: const Center(child: Text('Let\'s progress!\n\nYou can add desired tennis skills\nand choose few ones as goals\nfor game or training(1-3 recommended)',)),
                   );
                   },
                 icon: Icon(Icons.home)),
@@ -37,7 +37,7 @@ class HomePage extends ConsumerWidget {
                 tooltip: 'Progress ares/Tennis skills',  
                 onPressed: () {
                   ref.read(currentScreenProvider.notifier).state = ScreenData(
-                      title: 'Skills groups',
+                      title: 'Skills',
                       screen: const ProgressAreasScreen(),
                   );
                   },
