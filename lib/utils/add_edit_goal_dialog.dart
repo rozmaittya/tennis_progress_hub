@@ -10,39 +10,41 @@ Future<void> showAddEditGoalDialog({
   int? existingItemId,
 }) async {
   final db = ref.read(databaseProvider).value;
+  if (db == null) return;
+
+  // Load areas
+  final List<Map<String, dynamic>> areas =
+  (await db.getAll('progress_area')).cast<Map<String, dynamic>>();
+
+  // These store ONLY ids (so Dropdown never crashes due to Map reference equality)
+  int? selectedAreaId;
+  int? selectedItemId;
 
   List<Map<String, dynamic>> itemsInSelectedArea = [];
 
-  if (db == null) return;
-
-  //select all areas
-  final areas = await db.getAll('progress_area');
-  Map<String, dynamic>? selectedArea;
-  Map<String, dynamic>? selectedItem;
-
+  // If editing: preselect area + items list + selected item
   if (existingItemId != null) {
-    final items = await db.getAll(
+    final List<Map<String, dynamic>> itemRows = (await db.getAll(
       'progress_item',
       where: 'id = ?',
       whereArgs: [existingItemId],
-    );
-    if (items.isNotEmpty) {
-      selectedItem = items.first;
-      final area = await db.getAll(
-        'progress_area',
+    ))
+        .cast<Map<String, dynamic>>();
+
+    if (itemRows.isNotEmpty) {
+      final item = itemRows.first;
+      selectedItemId = item['id'] as int;
+      selectedAreaId = item['area_id'] as int;
+
+      itemsInSelectedArea = (await db.getAll(
+        'progress_item',
         where: 'area_id = ?',
-        whereArgs: [selectedItem['area_id']],
-      );
-      if (area.isNotEmpty) {
-        selectedArea = area.first;
-          itemsInSelectedArea = await db.getAll(
-            'progress_item',
-            where: 'area_id = ?',
-            whereArgs: [selectedArea['id']],
-          );
-      }
+        whereArgs: [selectedAreaId],
+      ))
+          .cast<Map<String, dynamic>>();
     }
   }
+
   await showDialog(
     context: context,
     builder: (context) {
@@ -53,27 +55,32 @@ Future<void> showAddEditGoalDialog({
             content: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                //Dropdown areas
-                DropdownButton<Map<String, dynamic>>(
+                // AREAS dropdown (id-based)
+                DropdownButton<int>(
                   isExpanded: true,
-                  hint: const Text('select Area'),
-                  value: selectedArea,
+                  hint: const Text('Select area'),
+                  value: selectedAreaId,
                   items: areas.map((area) {
-                    return DropdownMenuItem(
-                      value: area,
-                      child: Text(area['name']),
+                    final id = area['id'] as int;
+                    final name = (area['name'] ?? '').toString();
+                    return DropdownMenuItem<int>(
+                      value: id,
+                      child: Text(name),
                     );
                   }).toList(),
-                  onChanged: (value) async {
-                    final items = await db.getAll(
+                  onChanged: (areaId) async {
+                    if (areaId == null) return;
+
+                    final items = (await db.getAll(
                       'progress_item',
                       where: 'area_id = ?',
-                      whereArgs: [value!['id']],
-                    );
+                      whereArgs: [areaId],
+                    ))
+                        .cast<Map<String, dynamic>>();
 
                     setState(() {
-                      selectedArea = value;
-                      selectedItem = null;
+                      selectedAreaId = areaId;
+                      selectedItemId = null; // reset skill when area changes
                       itemsInSelectedArea = items;
                     });
                   },
@@ -81,25 +88,27 @@ Future<void> showAddEditGoalDialog({
 
                 const SizedBox(height: 12),
 
-                DropdownButton<Map<String, dynamic>>(
+                // ITEMS dropdown (id-based)
+                DropdownButton<int>(
                   isExpanded: true,
-                  hint: Text('Select skill'),
-                  value: selectedItem,
+                  hint: const Text('Select skill'),
+                  value: selectedItemId,
                   items: itemsInSelectedArea.map((item) {
-                    return DropdownMenuItem(
-                      value: item,
-                      child: Text(item['name']),
+                    final id = item['id'] as int;
+                    final name = (item['name'] ?? '').toString();
+                    return DropdownMenuItem<int>(
+                      value: id,
+                      child: Text(name),
                     );
                   }).toList(),
-                  onChanged: (value) {
+                  onChanged: (itemId) {
                     setState(() {
-                      selectedItem = value;
+                      selectedItemId = itemId;
                     });
                   },
                 ),
               ],
             ),
-
             actions: [
               TextButton(
                 onPressed: () => Navigator.of(context).pop(),
@@ -107,16 +116,13 @@ Future<void> showAddEditGoalDialog({
               ),
               TextButton(
                 onPressed: () async {
-                  if (selectedItem != null) {
+                  if (selectedItemId != null) {
                     final goalsNotifier = ref.read(goalsProvider.notifier);
 
                     if (existingGoalId == null) {
-                      await goalsNotifier.addGoal(selectedItem!['id']);
+                      await goalsNotifier.addGoal(selectedItemId!);
                     } else {
-                      await goalsNotifier.updateGoal(
-                        existingGoalId,
-                        selectedItem!['id'],
-                      );
+                      await goalsNotifier.updateGoal(existingGoalId, selectedItemId!);
                     }
 
                     await goalsNotifier.loadGoals();
