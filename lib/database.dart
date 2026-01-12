@@ -3,40 +3,52 @@ import 'package:path/path.dart';
 
 class AppDatabase {
   static final AppDatabase _instance = AppDatabase._internal();
+
   factory AppDatabase() => _instance;
 
   AppDatabase._internal();
 
   Database? db;
 
+  Database get _db {
+    final database = db;
+    if (database == null) {
+      throw StateError('Database is not initialized. Call initDatabase() first.');
+    }
+    return database;
+  }
+
   Future<void> initDatabase() async {
-    if(db == null ){
+    if (db == null) {
       final dbPath = await getDatabasesPath();
       final path = join(dbPath, 'app_database.db');
 
       db = await openDatabase(
-        path,
-        version: 3, // Erhöhe die Version bei Datenbankänderungen
-        onCreate: _onCreate,
-        onUpgrade: _onUpgrade,
-      );
+          path,
+          version: 3,
+          onConfigure: (db) async {
+            await db.execute('PRAGMA foreign_keys = ON');
+          },
+          onCreate: _onCreate);
     }
-
   }
 
   //creating database
+
+  //Table of skills areas (e.g., Forehand, Serve)
   Future<void> _onCreate(Database db, int version) async {
     await db.execute('''
       CREATE TABLE progress_area (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         name TEXT NOT NULL,
-      is_checked INTEGER NOT NULL DEFAULT 0        
+        is_checked INTEGER NOT NULL DEFAULT 0        
         )
     ''');
+    //Table of tennis skills (e.g., athletic position, to bow shoulders)
     await db.execute('''
       CREATE TABLE progress_item (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
-      area_id INT NOT NULL,
+      area_id INTEGER NOT NULL,
       name TEXT NOT NULL,
       is_checked INTEGER NOT NULL DEFAULT 0,
       FOREIGN KEY (area_id) REFERENCES progress_area(id)
@@ -44,12 +56,8 @@ class AppDatabase {
           ON UPDATE CASCADE
       )
     ''');
-  }
-
-  //upgrade database adding table "goals"
-  Future<void> _onUpgrade(Database db, int oldVersion, int newVersion) async {
-    if(oldVersion<3) {
-      await db.execute('''
+    //Table of training/game goals (user should selects 1-3 skills)
+    await db.execute('''
       CREATE TABLE goals (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       item_id INTEGER NOT NULL,
@@ -59,59 +67,73 @@ class AppDatabase {
           ON UPDATE CASCADE 
       )
       ''');
-    }
   }
 
   //universal insert function
-  Future<void> insertElement(String tableName, Map<String, dynamic> values) async {
-    await db!.insert(tableName, values);
+  Future<void> insertElement(
+    String tableName,
+    Map<String, dynamic> values,
+  ) async {
+    await _db.insert(tableName, values);
   }
 
   //universal select function
-  Future<List<Map<String, dynamic>>> getAll(String tableName,
-      {String? where, List<Object?>? whereArgs}) async {
-    return await db!.query(tableName, where: where, whereArgs: whereArgs);
+  Future<List<Map<String, dynamic>>> getAll(
+    String tableName, {
+    String? where,
+    List<Object?>? whereArgs,
+  }) async {
+    return await _db.query(tableName, where: where, whereArgs: whereArgs);
   }
 
   //universal toggle function
   Future<void> updateChecked(String tableName, int id, bool isChecked) async {
-    await db!.update(
+    await _db.update(
       tableName,
       {'is_checked': isChecked ? 1 : 0},
       where: 'id = ?',
       whereArgs: [id],
     );
   }
- //universal update name function
+
+  //universal update name function
   Future<void> updateName(String tableName, int id, String newName) async {
-    await db!.update(
-        tableName,
-        {'name': newName},
+    await _db.update(
+      tableName,
+      {'name': newName},
       where: 'id = ?',
-        whereArgs: [id],
+      whereArgs: [id],
     );
   }
 
-  Future<void> updateGoal(int id, int item_id) async {
-    await db!.update(
-    'goals',
-    {'item_id': item_id},
-        where: 'id = ?',
-        whereArgs: [id],
+  //goals table update function
+  Future<void> updateGoal(int id, int itemId) async {
+    await _db.update(
+      'goals',
+      {'item_id': itemId},
+      where: 'id = ?',
+      whereArgs: [id],
     );
   }
+
   //universal delete function
-  Future<void> deleteElement(String tableName, {String? where, List<Object?>? whereArgs}) async {
-    await db!.delete(tableName, where: where, whereArgs: whereArgs);
+  Future<void> deleteElement(
+    String tableName, {
+    String? where,
+    List<Object?>? whereArgs,
+  }) async {
+    await _db.delete(tableName, where: where, whereArgs: whereArgs);
   }
 
+  //close database function
   Future<void> close() async {
     //final db = await database;
-    await db!.close();
+    await _db.close();
   }
 
-    Future<List<Map<String, dynamic>>> getCheckedItemsWithAreaName() async {
-      final result = await db!.rawQuery('''
+  //choosing all learned skills function
+  Future<List<Map<String, dynamic>>> getCheckedItemsWithAreaName() async {
+    final result = await _db.rawQuery('''
       SELECT
         progress_item.id AS item_id,
         progress_item.name AS item_name,
@@ -124,11 +146,12 @@ class AppDatabase {
        WHERE progress_item.is_checked = 1  
       ''');
 
-      return result;
-    }
+    return result;
+  }
 
-    Future<List<Map<String, dynamic>>> getGoalsWithAreaItemName() async {
-    final result = await db!.rawQuery('''
+  //choosing training/game goals
+  Future<List<Map<String, dynamic>>> getGoalsWithAreaItemName() async {
+    final result = await _db.rawQuery('''
     SELECT 
       goals.id,
       progress_area.name AS area_name,
@@ -143,5 +166,5 @@ class AppDatabase {
     ''');
 
     return result;
-    }
+  }
 }
