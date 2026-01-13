@@ -58,6 +58,47 @@ class GoalsScreen extends ConsumerStatefulWidget {
                   PopupMenuItem(value: 'delete', child: Text('delete')),
                 ],
               );
+
+              if (!mounted || selected == null) return;
+
+              final goalsNotifier = ref.read(goalsProvider.notifier);
+              final goalId = goal['id'] as int;
+
+              switch (selected) {
+                case 'edit':
+                  final itemId = goal['item_id'] as int?;
+                  await showAddEditGoalDialog(
+                      context: context,
+                      ref: ref,
+                      existingGoalId: goalId,
+                      existingItemId: itemId,
+                  );
+                  break;
+
+                case 'achieved':
+                  await goalsNotifier.toggleGoal(goalId, true);
+                  await goalsNotifier.loadGoals();
+                  break;
+
+                case 'delete':
+                  final ok = await showDialog<bool>(
+                    context: context,
+                    builder: (_) => AlertDialog(
+                      title: const Text('Delete goal?'),
+                      content: const Text('Are you sure you want to delete this goal?'),
+                      actions: [
+                        TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Cancel')),
+                        TextButton(onPressed: () => Navigator.pop(context, true), child: const Text('Delete'))
+                      ],
+                    ),
+                  );
+
+                  if (ok == true) {
+                    await goalsNotifier.deleteGoal(goalId);
+                    await goalsNotifier.loadGoals();
+                  }
+                  break;
+              }
             },
           );
         },

@@ -156,6 +156,7 @@ class AppDatabase {
       goals.id,
       progress_area.name AS area_name,
       progress_item.name AS item_name,
+      goals.item_id,
       goals.is_checked
     FROM goals
     INNER JOIN progress_item
