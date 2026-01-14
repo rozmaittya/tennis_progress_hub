@@ -88,37 +88,111 @@ class _ProgressItemScreenState extends ConsumerState<ProgressItemScreen> {
   Widget build(BuildContext context) {
     final items = ref.watch(progressItemsProvider(widget.areaId));
     return GradientBackground(
-     // colors: [Colors.teal, Colors.orange],
+      // colors: [Colors.teal, Colors.orange],
       child: Scaffold(
         backgroundColor: Colors.transparent,
         appBar: AppBar(
-            title: Text(widget.areaName, style: TextStyle(
+          title: Text(
+            widget.areaName,
+            style: TextStyle(
               fontWeight: FontWeight.bold,
               fontSize: 18,
               color: Colors.black87,
-            ),),
-            backgroundColor: Colors.transparent,
+            ),
+          ),
+          backgroundColor: Colors.transparent,
         ),
         body: ListView.builder(
           itemCount: items.length,
           itemBuilder: (context, index) {
             final item = items[index];
             return ListTile(
-              title: Text(item['name'],
-              style: TextStyle(shadows: [
-                Shadow(offset: Offset(0.5, 0.5),
-                blurRadius: 1.0,
-                color: Colors.black26,)
-              ]),),
+              title: Text(
+                item['name'],
+                style: TextStyle(
+                  shadows: [
+                    Shadow(
+                      offset: Offset(0.5, 0.5),
+                      blurRadius: 1.0,
+                      color: Colors.black26,
+                    ),
+                  ],
+                ),
+              ),
               trailing: Checkbox(
                 value: item['is_checked'] == 1,
-                onChanged: (bool? value) {
-                  if (value != null) {
-                    _toggleItem(item['id'], value);
+                onChanged: (bool? value) async {
+                  if (value == null) return;
+
+                  if (value == true) {
+                    final ok = await showDialog<bool>(
+                      context: context,
+                      builder: (_) => AlertDialog(
+                        title: const Text('Mark as learned?'),
+                        content: const Text(
+                          'Do you really want to mark this skill as fully automated?',
+                        ),
+                        actions: [
+                          TextButton(
+                            onPressed: () => Navigator.pop(context, false),
+                            child: const Text('Cancel'),
+                          ),
+                          TextButton(
+                            onPressed: () => Navigator.pop(context, true),
+                            child: const Text('Yes, mastered'),
+                          ),
+                        ],
+                      ),
+                    );
+
+                    if (!context.mounted || ok != true) return;
                   }
+                  _toggleItem(item['id'], value);
                 },
               ),
-              onLongPress: () => _editItem(item['id'], item['name']),
+              onLongPress: () async {
+                final result = await showMenu<String>(
+                  context: context,
+                  position: const RelativeRect.fromLTRB(200, 200, 50, 50),
+                  items: const [
+                    PopupMenuItem(value: 'edit', child: Text('Edit')),
+                    PopupMenuItem(value: 'delete', child: Text('Delete')),
+                  ],
+                );
+
+                if (result == 'edit') {
+                  _editItem(item['id'], item['name']);
+                } else if (result == 'delete') {
+                  final ok = await showDialog<bool>(
+                    context: context,
+                    builder: (_) => AlertDialog(
+                      title: const Text('delete skill?'),
+                      content: const Text(
+                        'Are you sure you want to delete this skill?',
+                      ),
+                      actions: [
+                        TextButton(
+                          onPressed: () => Navigator.pop(context, false),
+                          child: const Text('Cancel'),
+                        ),
+                        TextButton(
+                          onPressed: () => Navigator.pop(context, true),
+                          child: const Text('Delete'),
+                        ),
+                      ],
+                    ),
+                  );
+
+                  if (ok == true) {
+                    await ref
+                        .read(progressItemsProvider(widget.areaId).notifier)
+                        .deleteItem(item['id']);
+                    await ref
+                        .read(progressItemsProvider(widget.areaId).notifier)
+                        .loadItems();
+                  }
+                }
+              },
             );
           },
         ),
