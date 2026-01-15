@@ -27,24 +27,77 @@ class GoalsScreen extends ConsumerStatefulWidget {
         itemBuilder: (context, index) {
           final goal = goals[index];
           return GestureDetector(
-            child: ListTile(
-              leading: IconButton(
-                onPressed: () {},
-                icon: Icon(Icons.check_box),
-                color: Colors.green,
+            child: Container(
+              margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+              decoration: BoxDecoration(
+                color: Colors.white.withOpacity(0.35),
+                borderRadius: BorderRadius.circular(16),
+                boxShadow: const [
+                  BoxShadow(
+                    blurRadius: 8,
+                    offset: Offset(0, 3),
+                    color: Colors.black12,
+                  ),
+                ],
               ),
-              title: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
+              child: Row(
                 children: [
-                  Text(goal['area_name'], style: TextStyle(fontSize: 14)),
-                  Text(
-                    '    ' + (goal['item_name'] ?? ''),
-                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+                  // left accent line
+                  Container(
+                    width: 6,
+                    height: 80,
+                    decoration: const BoxDecoration(
+                      color: Colors.green,
+                      borderRadius: BorderRadius.only(
+                        topLeft: Radius.circular(16),
+                        bottomLeft: Radius.circular(16),
+                      ),
+                    ),
+                  ),
+
+                  Expanded(
+                    child: ListTile(
+                      contentPadding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                      title: Text(
+                        goal['area_name'],
+                        style: const TextStyle(fontSize: 13, color: Colors.black54),
+                      ),
+                      subtitle: Padding(
+                        padding: const EdgeInsets.only(top: 4),
+                        child: Text(
+                          goal['item_name'] ?? '',
+                          style: const TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 18,
+                          ),
+                        ),
+                      ),
+                     // trailing: const Icon(Icons.more_vert),
+                    ),
                   ),
                 ],
               ),
             ),
+
+            // child: ListTile(
+            //   leading: IconButton(
+            //     onPressed: () {},
+            //     icon: Icon(Icons.check_box),
+            //     color: Colors.green,
+            //   ),
+            //   title: Column(
+            //     crossAxisAlignment: CrossAxisAlignment.start,
+            //     mainAxisSize: MainAxisSize.min,
+            //     children: [
+            //       Text(goal['area_name'], style: TextStyle(fontSize: 14)),
+            //       Text(
+            //         '    ' + (goal['item_name'] ?? ''),
+            //         style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+            //       ),
+            //     ],
+            //   ),
+            // ),
             onTapDown: (details) {
               _tapPosition = details.globalPosition;
             },
