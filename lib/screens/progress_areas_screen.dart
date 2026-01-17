@@ -127,17 +127,8 @@ class _ProgressAreasScreenState extends ConsumerState<ProgressAreasScreen> {
             title: Text(item['name'], style:
               TextStyle(
                 fontWeight: FontWeight.bold,
-              ),),
-            //we don't need the option for progress areas now
-            // trailing: Checkbox(
-            //   value: item['is_checked'] == 1,
-            //   onChanged: (bool? value) {
-            //     if (value != null) {
-            //       _toggleItem(item['id'], value);
-            //     }
-            //   },
-            // ),
-
+              ),
+            ),
             onTap: () {
               Navigator.push(
                 context,

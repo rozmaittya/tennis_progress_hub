@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:progress_hub_2/utils/gradient_background.dart';
-import 'progress_areas_screen.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../providers/providers.dart';
 import '../screens/goals_screen.dart';
 import '../screens/screen_data.dart';
 import '../screens/progress_areas_screen.dart';
-import '../widgets/tennis_ball_button.dart';
+import '../screens/mastered_skills_screen.dart';
+
 
 class HomePage extends ConsumerWidget {
   const HomePage({super.key});
@@ -34,7 +34,7 @@ class HomePage extends ConsumerWidget {
             actions: [
               IconButton(
                 icon: Icon(Icons.spoke),
-                tooltip: 'Progress ares/Tennis skills',  
+                tooltip: 'Progress areas/Tennis skills',
                 onPressed: () {
                   ref.read(currentScreenProvider.notifier).state = ScreenData(
                       title: 'Skills',
@@ -52,8 +52,12 @@ class HomePage extends ConsumerWidget {
                   );
                 }, ),
               IconButton(
+                  tooltip: 'Mastered skills',
                   onPressed: () {
-
+                    ref.read(currentScreenProvider.notifier).state = ScreenData(
+                        title: 'Mastered skills',
+                        screen: const MasteredSkillsScreen(),
+                    );
               },
                   icon: Icon(Icons.accessibility_new)),
             ],

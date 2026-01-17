@@ -3,6 +3,7 @@ import '../utils/edit_item_dialog.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../providers/progress_items_providers.dart';
 import '../providers/database_provider.dart';
+import '../providers/mastered_screens_providers.dart';
 import '../widgets/tennis_ball_button.dart';
 import '../utils/gradient_background.dart';
 
@@ -148,6 +149,7 @@ class _ProgressItemScreenState extends ConsumerState<ProgressItemScreen> {
                     if (!context.mounted || ok != true) return;
                   }
                   _toggleItem(item['id'], value);
+                  ref.invalidate(masteredSkillsProvider);
                 },
               ),
               onLongPress: () async {

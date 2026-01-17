@@ -13,7 +13,9 @@ class AppDatabase {
   Database get _db {
     final database = db;
     if (database == null) {
-      throw StateError('Database is not initialized. Call initDatabase() first.');
+      throw StateError(
+        'Database is not initialized. Call initDatabase() first.',
+      );
     }
     return database;
   }
@@ -24,12 +26,13 @@ class AppDatabase {
       final path = join(dbPath, 'app_database.db');
 
       db = await openDatabase(
-          path,
-          version: 3,
-          onConfigure: (db) async {
-            await db.execute('PRAGMA foreign_keys = ON');
-          },
-          onCreate: _onCreate);
+        path,
+        version: 3,
+        onConfigure: (db) async {
+          await db.execute('PRAGMA foreign_keys = ON');
+        },
+        onCreate: _onCreate,
+      );
     }
   }
 
@@ -164,6 +167,22 @@ class AppDatabase {
     INNER JOIN progress_area
       ON progress_item.area_id = progress_area.id
     WHERE goals.is_checked = 0
+    ''');
+
+    return result;
+  }
+
+  Future<List<Map<String, dynamic>>> getMasteredSkills() async {
+    final result = await _db.rawQuery('''
+    SELECT
+      progress_item.id,
+      progress_area.name AS area_name,
+      progress_item.name AS item_name,
+      progress_item.is_checked
+    FROM progress_item
+    INNER JOIN progress_area
+      ON progress_item.area_id = progress_area.id
+    WHERE progress_item.is_checked = 1
     ''');
 
     return result;
