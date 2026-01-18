@@ -1,15 +1,13 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:progress_hub_2/screens/home_content_screen.dart';
 import '../screens/screen_data.dart';
+import '../screens/home_content_screen.dart';
 
 
 final currentScreenProvider = StateProvider<ScreenData>((ref) {
   return ScreenData(
-    title: 'Let\'s progress!',
-    screen: const Center(child: Text('Add new skills\nor choose 1-3 goals\nfor game or training', style:
-        TextStyle(
-          fontFamily: 'Roboto',
-          fontSize: 18,
-        ),))
-  );
+    title: 'Tennis Hub',
+    screen: const HomeContentScreen(),
+        );
 });

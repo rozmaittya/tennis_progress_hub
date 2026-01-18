@@ -1,10 +1,12 @@
 // Додаток для вдосконалення гри у теніс для Flutter
 import 'package:flutter/material.dart';
+import 'package:progress_hub_2/providers/goals_providers.dart';
 import '../providers/progress_areas_providers.dart';
 import '../screens/progress_item_screen.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../widgets/tennis_ball_button.dart';
 import '../utils/gradient_background.dart';
+import '../providers/mastered_screens_providers.dart';
 
 class ProgressAreasScreen extends ConsumerStatefulWidget {
   const ProgressAreasScreen({super.key});
@@ -51,6 +53,9 @@ class _ProgressAreasScreenState extends ConsumerState<ProgressAreasScreen> {
     ).then((result) async {
       if (result != null && result is String) {
         await ref.read(progressAreasProvider.notifier).editArea(id, result);
+        ref.invalidate(masteredSkillsProvider);
+        ref.invalidate(goalsProvider);
+
       }
     });
   }

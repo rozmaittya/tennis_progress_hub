@@ -6,6 +6,8 @@ import '../screens/goals_screen.dart';
 import '../screens/screen_data.dart';
 import '../screens/progress_areas_screen.dart';
 import '../screens/mastered_skills_screen.dart';
+import '../screens/home_content_screen.dart';
+import '../widgets/help_dialog.dart';
 
 
 class HomePage extends ConsumerWidget {
@@ -26,8 +28,8 @@ class HomePage extends ConsumerWidget {
             leading: IconButton(
                 onPressed: () {
                   ref.read(currentScreenProvider.notifier).state = ScreenData(
-                      title: 'Tennis hub',
-                      screen: const Center(child: Text('Let\'s progress!\n\nYou can add desired tennis skills\nand choose few ones as goals\nfor game or training(1-3 recommended)',)),
+                      title: 'Tennis Hub',
+                      screen: const HomeContentScreen(),
                   );
                   },
                 icon: Icon(Icons.home)),
@@ -60,6 +62,17 @@ class HomePage extends ConsumerWidget {
                     );
               },
                   icon: Icon(Icons.accessibility_new)),
+              IconButton(
+                icon: const Icon(Icons.info_outline),
+                tooltip: 'How it works',
+                onPressed: () {
+                  showDialog(
+                    context: context,
+                    builder: (_) => const HelpDialog(),
+                  );
+                },
+              ),
+
             ],
           ),
           body: currentScreen.screen,

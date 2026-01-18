@@ -70,6 +70,11 @@ class AppDatabase {
           ON UPDATE CASCADE 
       )
       ''');
+    //Base progress area
+    await db.execute('''
+      INSERT INTO progress_area (name)
+      VALUES ('Forehand'), ('Backhand'), ('Serve'), ('Return'), ('Volley'), ('Overhead'), ('Slice'), ('Drop Shot'), ('Lob'), ('Movement'), ('Tactics'), ('Mindset')
+    ''');
   }
 
   //universal insert function

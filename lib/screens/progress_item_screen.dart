@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../providers/progress_items_providers.dart';
 import '../providers/database_provider.dart';
 import '../providers/mastered_screens_providers.dart';
+import '../providers/goals_providers.dart';
 import '../widgets/tennis_ball_button.dart';
 import '../utils/gradient_background.dart';
 
@@ -37,8 +38,10 @@ class _ProgressItemScreenState extends ConsumerState<ProgressItemScreen> {
       tableName: 'progress_item',
       id: id,
       currentName: currentName,
-      onUpdated: () =>
-          ref.read(progressItemsProvider(widget.areaId).notifier).loadItems(),
+      onUpdated: () {
+          ref.read(progressItemsProvider(widget.areaId).notifier).loadItems();
+          ref.invalidate(goalsProvider);
+      },
     );
   }
 
@@ -148,7 +151,7 @@ class _ProgressItemScreenState extends ConsumerState<ProgressItemScreen> {
 
                     if (!context.mounted || ok != true) return;
                   }
-                  _toggleItem(item['id'], value);
+                  await _toggleItem(item['id'], value);
                   ref.invalidate(masteredSkillsProvider);
                 },
               ),
