@@ -43,10 +43,19 @@ class ProgressAreasNotifier extends StateNotifier<List<Map<String, dynamic>>> {
     await loadAreas();
   }
 
-  Future<void> toggleArea(int id, bool is_checked) async {
+  Future<void> toggleArea(int id, bool isChecked) async {
     if (db == null) return;
 
-    await db?.updateChecked('progress_areas', id, is_checked);
+    await db?.updateChecked('progress_area', id, isChecked);
     await loadAreas();
   }
 }
+
+final areaIdByNameProvider = Provider.family<int?, String>((ref, areaName) {
+  final areas = ref.watch(progressAreasProvider);
+
+  for (final a in areas) {
+    if (a['name'] == areaName) return a['id'] as int;
+  }
+  return null;
+});

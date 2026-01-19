@@ -21,6 +21,9 @@ class HomePage extends ConsumerWidget {
         child: Scaffold(
           backgroundColor: Colors.transparent,
           appBar: AppBar(
+            leadingWidth: 36,
+            titleSpacing: 8,
+
             backgroundColor: Colors.transparent,
             title: Text(currentScreen.title ?? 'Main', style: TextStyle(
               fontSize: 16,
@@ -32,10 +35,12 @@ class HomePage extends ConsumerWidget {
                       screen: const HomeContentScreen(),
                   );
                   },
-                icon: Icon(Icons.home)),
+                icon: Icon(Icons.home),
+                visualDensity: VisualDensity.compact,
+            ),
             actions: [
               IconButton(
-                icon: Icon(Icons.spoke),
+                icon: Icon(Icons.spoke), //sports_martial_arts_rounded),
                 tooltip: 'Progress areas/Tennis skills',
                 onPressed: () {
                   ref.read(currentScreenProvider.notifier).state = ScreenData(

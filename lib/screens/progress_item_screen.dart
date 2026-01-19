@@ -83,7 +83,10 @@ class _ProgressItemScreenState extends ConsumerState<ProgressItemScreen> {
       if (result != null && result is String) {
         await ref
             .read(progressItemsProvider(widget.areaId).notifier)
-            .addItem(widget.areaId, result);
+            .addItem(result);
+        // await ref
+        //             .read(progressItemsProvider(widget.areaId).notifier)
+        //             .addItem(widget.areaId, result);
       }
     });
   }

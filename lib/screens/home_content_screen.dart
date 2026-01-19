@@ -1,19 +1,19 @@
+import 'package:progress_hub_2/providers/database_provider.dart';
+import 'package:progress_hub_2/providers/progress_items_providers.dart';
+
 import '../providers/tips_providers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../providers/progress_areas_providers.dart';
 
 class HomeContentScreen extends ConsumerWidget {
   const HomeContentScreen({super.key});
 
-  String formatAreaKey(String key) {
-    return key
-        .split('_')
-        .map((w) => w[0].toUpperCase() + w.substring(1))
-        .join(' ');
-  }
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final tip = ref.watch(tipProvider);
+
+    final areas = ref.watch(progressAreasProvider);
 
     return ListView(
      padding: const EdgeInsets.all(16),
@@ -38,7 +38,7 @@ class HomeContentScreen extends ConsumerWidget {
               children: [
                 //Tip title
                 Text(
-                  'Tip of the Day • ${formatAreaKey(tip.areaKey)}',
+                  tip.title,
                   style: const TextStyle(
                     fontWeight: FontWeight.bold,
                     fontSize: 15,
@@ -50,18 +50,75 @@ class HomeContentScreen extends ConsumerWidget {
                 //Tip text
                 Text(
                   tip.text.isEmpty ? 'No tip available.' : tip.text,
-                  style: const TextStyle(fontSize: 14),
+                  style: const TextStyle(fontSize: 20),
                 ),
 
                 const SizedBox(height: 12,),
 
+                ElevatedButton.icon(
+                  onPressed: () async {
+                    final tip = ref.read(tipProvider);
+
+                      if (tip.text.isEmpty || tip.area.isEmpty) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(content: Text('No tip to add')));
+                        return;
+                      }
+
+                    final areaId = ref.read(areaIdByNameProvider(tip.area));
+
+                    if (areaId == null) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text('Skills group "${tip.area}" not found'),)
+                      );
+                      return;
+                    }
+
+                    await ref.read(progressItemsProvider(areaId).notifier).addItem(tip.text);
+
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text('Tip added to skills'))
+                    );
+                  },
+
+                  icon: const Icon(Icons.add),
+                  label: const Text('Add Tip to Skills'),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.transparent,
+                    foregroundColor: Colors.black87,
+                    elevation: 0,
+                    side: BorderSide(color: Colors.black87.withOpacity(0.6)),
+                  ),
+                ),
+
+                SizedBox(height: 10),
+
                 Row(
                   children: [
-                    TextButton.icon(
+                    ElevatedButton.icon(
                         onPressed: () => ref.read(tipProvider.notifier).nextTip(),
                         icon: const Icon(Icons.refresh),
                         label: const Text('Next tip'),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.transparent,
+                          foregroundColor: Colors.black38,
+                          elevation: 0,
+                          side: BorderSide(color: Colors.black38.withOpacity(0.4)),
+                        ),
+                    ),
 
+                    SizedBox(width: 10),
+
+                    ElevatedButton.icon(
+                      onPressed: () => ref.read(tipProvider.notifier).backToTipOfTheDay(),
+                      icon: const Icon(Icons.arrow_back_outlined),
+                      label: const Text('Tip of the Day'),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.transparent,
+                        foregroundColor: Colors.black38,
+                        elevation: 0,
+                        side: BorderSide(color: Colors.black38.withOpacity(0.4)),
+                      ),
                     ),
                   ],
                 )
