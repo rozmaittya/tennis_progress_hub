@@ -73,8 +73,8 @@ Future<void> showAddEditGoalDialog({
 
                     final items = (await db.getAll(
                       'progress_item',
-                      where: 'area_id = ?',
-                      whereArgs: [areaId],
+                      where: 'area_id = ? AND is_checked = ?',
+                      whereArgs: [areaId, 0],
                     ))
                         .cast<Map<String, dynamic>>();
 

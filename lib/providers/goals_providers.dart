@@ -29,17 +29,17 @@ Future<void> loadGoals() async {
     state = result;
 }
 
-Future<void> addGoal(int item_id) async {
+Future<void> addGoal(int itemId) async {
     if(db == null) return;
 
-    await db!.insertElement('goals', {'item_id': item_id, 'is_checked': 0});
+    await db!.insertElement('goals', {'item_id': itemId, 'is_checked': 0});
     await loadGoals();
 }
 
-Future<void> updateGoal(int id, int item_id) async {
+Future<void> updateGoal(int id, int itemId) async {
     if(db == null) return;
 
-    await db!.updateGoal(id, item_id);
+    await db!.updateGoal(id, itemId);
 }
 
 Future<void> toggleGoal(int id, bool isChecked) async {
