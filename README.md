@@ -1,16 +1,15 @@
-# progress_hub_2
+# Tennis Hub 🎾
 
-A new Flutter project.
+Flutter app for tracking tennis skills, training goals, and daily tips.
 
-## Getting Started
+## Features
+- Skill groups and progress tracking
+- Training/game goals
+- Tip of the Day
+- Local SQLite database (sqflite)
+- Riverpod state management
 
-This project is a starting point for a Flutter application.
-
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+## Tech stack
+- Flutter
+- Riverpod
+- SQLite (sqflite)
