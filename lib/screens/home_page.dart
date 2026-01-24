@@ -25,7 +25,7 @@ class HomePage extends ConsumerWidget {
             titleSpacing: 8,
 
             backgroundColor: Colors.transparent,
-            title: Text(currentScreen.title ?? 'Main', style: TextStyle(
+            title: Text(currentScreen.title, style: const TextStyle(
               fontSize: 16,
             ),),
             leading: IconButton(
@@ -40,7 +40,7 @@ class HomePage extends ConsumerWidget {
             ),
             actions: [
               IconButton(
-                icon: Icon(Icons.spoke), //sports_martial_arts_rounded),
+                icon: Icon(Icons.spoke),
                 tooltip: 'Progress areas/Tennis skills',
                 onPressed: () {
                   ref.read(currentScreenProvider.notifier).state = ScreenData(

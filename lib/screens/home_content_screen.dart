@@ -1,11 +1,9 @@
-import 'package:progress_hub_2/providers/database_provider.dart';
-import 'package:progress_hub_2/providers/progress_items_providers.dart';
-
-import '../providers/tips_providers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../providers/progress_areas_providers.dart';
 import 'package:flutter/services.dart';
+import '../providers/progress_items_providers.dart';
+import '../providers/tips_providers.dart';
+import '../providers/progress_areas_providers.dart';
 
 class HomeContentScreen extends ConsumerWidget {
   const HomeContentScreen({super.key});
@@ -13,8 +11,6 @@ class HomeContentScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final tip = ref.watch(tipProvider);
-
-    final areas = ref.watch(progressAreasProvider);
 
     return ListView(
       padding: const EdgeInsets.all(16),
@@ -30,13 +26,19 @@ class HomeContentScreen extends ConsumerWidget {
 
         GestureDetector(
           onLongPress: () {
-            Clipboard.setData(ClipboardData(text: tip.title + '\n' + tip.text));
+            Clipboard.setData(
+              ClipboardData(
+                text: '''
+            ${tip.title}
+            ${tip.text}
+            '''),
+            );
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(content: Text('Tip copied to clipboard')),
             );
           },
           child: Card(
-            color: Colors.white.withOpacity(0.15),
+            color: Colors.white.withValues(alpha: 0.15),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(16),
             ),
@@ -93,6 +95,8 @@ class HomeContentScreen extends ConsumerWidget {
                           .read(progressItemsProvider(areaId).notifier)
                           .addItem(tip.text);
 
+                      if (!context.mounted) return;
+
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(content: Text('Tip added to skills')),
                       );
@@ -104,7 +108,9 @@ class HomeContentScreen extends ConsumerWidget {
                       backgroundColor: Colors.transparent,
                       foregroundColor: Colors.black87,
                       elevation: 0,
-                      side: BorderSide(color: Colors.black87.withOpacity(0.6)),
+                      side: BorderSide(
+                        color: Colors.black87.withValues(alpha: 0.6),
+                      ),
                     ),
                   ),
 
@@ -122,7 +128,7 @@ class HomeContentScreen extends ConsumerWidget {
                           foregroundColor: Colors.black38,
                           elevation: 0,
                           side: BorderSide(
-                            color: Colors.black38.withOpacity(0.4),
+                            color: Colors.black38.withValues(alpha: 0.4),
                           ),
                         ),
                       ),
@@ -139,7 +145,7 @@ class HomeContentScreen extends ConsumerWidget {
                           foregroundColor: Colors.black38,
                           elevation: 0,
                           side: BorderSide(
-                            color: Colors.black38.withOpacity(0.4),
+                            color: Colors.black38.withValues(alpha: 0.4),
                           ),
                         ),
                       ),

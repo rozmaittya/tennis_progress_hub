@@ -23,13 +23,13 @@ class GoalsScreen extends ConsumerStatefulWidget {
       backgroundColor: Colors.transparent,
       body: ListView.builder(
         itemCount: goals.length,
-        itemBuilder: (context, index) {
+        itemBuilder: (itemContext, index) {
           final goal = goals[index];
           return GestureDetector(
             child: Container(
               margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
               decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.35),
+                color: Colors.white.withValues(alpha: 0.35),
                 borderRadius: BorderRadius.circular(16),
                 boxShadow: const [
                   BoxShadow(
@@ -93,7 +93,7 @@ class GoalsScreen extends ConsumerStatefulWidget {
                 ],
               );
 
-              if (!mounted || selected == null) return;
+              if (!context.mounted || selected == null) return;
 
               final goalsNotifier = ref.read(goalsProvider.notifier);
               final goalId = goal['id'] as int;
@@ -107,25 +107,29 @@ class GoalsScreen extends ConsumerStatefulWidget {
                       existingGoalId: goalId,
                       existingItemId: itemId,
                   );
+                  if (!context.mounted) return;
                   break;
 
                 case 'achieved':
                   await goalsNotifier.toggleGoal(goalId, true);
                   await goalsNotifier.loadGoals();
+                  if (!context.mounted) return;
                   break;
 
                 case 'delete':
                   final ok = await showDialog<bool>(
                     context: context,
-                    builder: (_) => AlertDialog(
+                    builder: (dialogContext) => AlertDialog(
                       title: const Text('Delete goal?'),
                       content: const Text('Are you sure you want to delete this goal?'),
                       actions: [
-                        TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Cancel')),
-                        TextButton(onPressed: () => Navigator.pop(context, true), child: const Text('Delete'))
+                        TextButton(onPressed: () => Navigator.pop(dialogContext, false), child: const Text('Cancel')),
+                        TextButton(onPressed: () => Navigator.pop(dialogContext, true), child: const Text('Delete'))
                       ],
                     ),
                   );
+
+                  if (!context.mounted) return;
 
                   if (ok == true) {
                     await goalsNotifier.deleteGoal(goalId);

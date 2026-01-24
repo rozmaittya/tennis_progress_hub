@@ -2,7 +2,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/material.dart';
 import 'package:progress_hub_2/providers/progress_items_providers.dart';
 import '../providers/mastered_screens_providers.dart';
-import '../widgets/tennis_ball_button.dart';
 
 class MasteredSkillsScreen extends ConsumerStatefulWidget {
   const MasteredSkillsScreen({super.key});
@@ -66,7 +65,6 @@ class _MasteredSkillsScreenState extends ConsumerState<MasteredSkillsScreen> {
                     masteredSkill['id'] as int,
                     false,
                   );
-                  // await masteredSkillsNotifier.loadMasteredSkills();
                   ref.invalidate(progressItemsProvider);
                 }
               },

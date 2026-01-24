@@ -9,6 +9,7 @@ Future<void> showAddEditGoalDialog({
   int? existingGoalId,
   int? existingItemId,
 }) async {
+
   final db = ref.read(databaseProvider).value;
   if (db == null) return;
 
@@ -16,13 +17,11 @@ Future<void> showAddEditGoalDialog({
   final List<Map<String, dynamic>> areas =
   (await db.getAll('progress_area')).cast<Map<String, dynamic>>();
 
-  // These store ONLY ids (so Dropdown never crashes due to Map reference equality)
   int? selectedAreaId;
   int? selectedItemId;
 
   List<Map<String, dynamic>> itemsInSelectedArea = [];
 
-  // If editing: preselect area + items list + selected item
   if (existingItemId != null) {
     final List<Map<String, dynamic>> itemRows = (await db.getAll(
       'progress_item',
@@ -47,7 +46,7 @@ Future<void> showAddEditGoalDialog({
 
   await showDialog(
     context: context,
-    builder: (context) {
+    builder: (dialogContext) {
       return StatefulBuilder(
         builder: (context, setState) {
           return AlertDialog(
@@ -55,7 +54,6 @@ Future<void> showAddEditGoalDialog({
             content: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                // AREAS dropdown (id-based)
                 DropdownButton<int>(
                   isExpanded: true,
                   hint: const Text('Select area'),
@@ -80,7 +78,7 @@ Future<void> showAddEditGoalDialog({
 
                     setState(() {
                       selectedAreaId = areaId;
-                      selectedItemId = null; // reset skill when area changes
+                      selectedItemId = null;
                       itemsInSelectedArea = items;
                     });
                   },
@@ -88,7 +86,6 @@ Future<void> showAddEditGoalDialog({
 
                 const SizedBox(height: 12),
 
-                // ITEMS dropdown (id-based)
                 DropdownButton<int>(
                   isExpanded: true,
                   hint: const Text('Select skill'),
@@ -111,7 +108,7 @@ Future<void> showAddEditGoalDialog({
             ),
             actions: [
               TextButton(
-                onPressed: () => Navigator.of(context).pop(),
+                onPressed: () => Navigator.of(dialogContext).pop(),
                 child: const Text('Cancel'),
               ),
               TextButton(
@@ -126,7 +123,9 @@ Future<void> showAddEditGoalDialog({
                     }
 
                     await goalsNotifier.loadGoals();
-                    Navigator.of(context).pop();
+
+                    if (!dialogContext.mounted) return;
+                    Navigator.of(dialogContext).pop();
                   } else {
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(content: Text('Please select skill')),

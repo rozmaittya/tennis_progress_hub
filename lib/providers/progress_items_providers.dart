@@ -33,9 +33,7 @@ class ProgressItemsNotifier extends StateNotifier<List<Map<String, dynamic>>> {
     state = items;
   }
 
-  //Future<void> addItem(int areaId, String name) async {
-
-    Future<void> addItem(String name) async {
+  Future<void> addItem(String name) async {
     if (db == null) return;
     await db!.insertElement('progress_item', {
       'area_id': areaId,

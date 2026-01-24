@@ -1,11 +1,9 @@
-// Додаток для вдосконалення гри у теніс для Flutter
 import 'package:flutter/material.dart';
 import 'package:progress_hub_2/providers/goals_providers.dart';
 import '../providers/progress_areas_providers.dart';
 import '../screens/progress_item_screen.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../widgets/tennis_ball_button.dart';
-import '../utils/gradient_background.dart';
 import '../providers/mastered_screens_providers.dart';
 
 class ProgressAreasScreen extends ConsumerStatefulWidget {
@@ -60,12 +58,6 @@ class _ProgressAreasScreenState extends ConsumerState<ProgressAreasScreen> {
     });
   }
 
-// we don't need this option for progress area now
-//   Future<void> _toggleItem(int id, bool isChecked) async {
-//     await ref.read(progressAreasProvider.notifier).toggleArea(id, isChecked);
-//   }
-
-//adding new progress area
   Future<void> _showAddItemDialog() async {
     String itemName = '';
     await showDialog(

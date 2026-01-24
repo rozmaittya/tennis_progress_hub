@@ -1,6 +1,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
     <application
-        android:label="progress_hub_2"
+        android:label="Tennis Hub"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity

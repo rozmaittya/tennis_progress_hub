@@ -172,7 +172,7 @@ class AppDatabase {
       ON goals.item_id = progress_item.id
     INNER JOIN progress_area
       ON progress_item.area_id = progress_area.id
-    WHERE goals.is_checked = 0 AND item_is_checked = 0
+    WHERE goals.is_checked = 0 AND progress_item.is_checked = 0
     ''');
 
     return result;

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import '../utils/edit_item_dialog.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../utils/edit_item_dialog.dart';
 import '../providers/progress_items_providers.dart';
 import '../providers/database_provider.dart';
 import '../providers/mastered_screens_providers.dart';
@@ -13,10 +13,10 @@ class ProgressItemScreen extends ConsumerStatefulWidget {
   final String areaName;
 
   const ProgressItemScreen({
+    super.key,
     required this.areaId,
     required this.areaName,
-    Key? key,
-  }) : super(key: key);
+  });
 
   @override
   ConsumerState<ProgressItemScreen> createState() => _ProgressItemScreenState();
@@ -32,6 +32,7 @@ class _ProgressItemScreenState extends ConsumerState<ProgressItemScreen> {
   Future<void> _editItem(int id, String currentName) async {
     final db = ref.read(databaseProvider).value;
     if (db == null) return;
+
     await editItemDialog(
       context: context,
       db: db,
@@ -39,17 +40,18 @@ class _ProgressItemScreenState extends ConsumerState<ProgressItemScreen> {
       id: id,
       currentName: currentName,
       onUpdated: () {
-          ref.read(progressItemsProvider(widget.areaId).notifier).loadItems();
-          ref.invalidate(goalsProvider);
+        ref.read(progressItemsProvider(widget.areaId).notifier).loadItems();
+        ref.invalidate(goalsProvider);
       },
     );
   }
 
   Future<void> _showAddItemDialog() async {
     String itemName = '';
-    await showDialog(
+
+    final result = await showDialog<String>(
       context: context,
-      builder: (BuildContext context) {
+      builder: (dialogContext) {
         return AlertDialog(
           title: const Text('Add new skill'),
           content: TextField(
@@ -59,15 +61,13 @@ class _ProgressItemScreenState extends ConsumerState<ProgressItemScreen> {
           ),
           actions: [
             TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
+              onPressed: () => Navigator.of(dialogContext).pop(),
               child: const Text('Cancel'),
             ),
             TextButton(
               onPressed: () {
                 if (itemName.trim().isNotEmpty) {
-                  Navigator.of(context).pop(itemName);
+                  Navigator.of(dialogContext).pop(itemName);
                 } else {
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(content: Text('Name should be not empty')),
@@ -79,29 +79,28 @@ class _ProgressItemScreenState extends ConsumerState<ProgressItemScreen> {
           ],
         );
       },
-    ).then((result) async {
-      if (result != null && result is String) {
-        await ref
-            .read(progressItemsProvider(widget.areaId).notifier)
-            .addItem(result);
-        // await ref
-        //             .read(progressItemsProvider(widget.areaId).notifier)
-        //             .addItem(widget.areaId, result);
-      }
-    });
+    );
+
+    if (!mounted) return;
+
+    if (result != null) {
+      await ref
+          .read(progressItemsProvider(widget.areaId).notifier)
+          .addItem(result);
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     final items = ref.watch(progressItemsProvider(widget.areaId));
+
     return GradientBackground(
-      // colors: [Colors.teal, Colors.orange],
       child: Scaffold(
         backgroundColor: Colors.transparent,
         appBar: AppBar(
           title: Text(
             widget.areaName,
-            style: TextStyle(
+            style: const TextStyle(
               fontWeight: FontWeight.bold,
               fontSize: 18,
               color: Colors.black87,
@@ -111,12 +110,13 @@ class _ProgressItemScreenState extends ConsumerState<ProgressItemScreen> {
         ),
         body: ListView.builder(
           itemCount: items.length,
-          itemBuilder: (context, index) {
+          itemBuilder: (itemContext, index) {
             final item = items[index];
+
             return ListTile(
               title: Text(
-                item['name'],
-                style: TextStyle(
+                (item['name'] ?? '').toString(),
+                style: const TextStyle(
                   shadows: [
                     Shadow(
                       offset: Offset(0.5, 0.5),
@@ -134,27 +134,29 @@ class _ProgressItemScreenState extends ConsumerState<ProgressItemScreen> {
                   if (value == true) {
                     final ok = await showDialog<bool>(
                       context: context,
-                      builder: (_) => AlertDialog(
+                      builder: (dialogContext) => AlertDialog(
                         title: const Text('Mark as learned?'),
                         content: const Text(
                           'Do you really want to mark this skill as fully automated?',
                         ),
                         actions: [
                           TextButton(
-                            onPressed: () => Navigator.pop(context, false),
+                            onPressed: () =>
+                                Navigator.pop(dialogContext, false),
                             child: const Text('Cancel'),
                           ),
                           TextButton(
-                            onPressed: () => Navigator.pop(context, true),
+                            onPressed: () => Navigator.pop(dialogContext, true),
                             child: const Text('Yes, mastered'),
                           ),
                         ],
                       ),
                     );
 
-                    if (!context.mounted || ok != true) return;
+                    if (!mounted || ok != true) return;
                   }
-                  await _toggleItem(item['id'], value);
+
+                  await _toggleItem(item['id'] as int, value);
                   ref.invalidate(masteredSkillsProvider);
                 },
               ),
@@ -168,33 +170,41 @@ class _ProgressItemScreenState extends ConsumerState<ProgressItemScreen> {
                   ],
                 );
 
+                if (!mounted) return;
+
                 if (result == 'edit') {
-                  _editItem(item['id'], item['name']);
+                  await _editItem(
+                    item['id'] as int,
+                    (item['name'] ?? '').toString(),
+                  );
+                  if (!mounted) return;
                 } else if (result == 'delete') {
                   final ok = await showDialog<bool>(
                     context: context,
-                    builder: (_) => AlertDialog(
-                      title: const Text('delete skill?'),
+                    builder: (dialogContext) => AlertDialog(
+                      title: const Text('Delete skill?'),
                       content: const Text(
                         'Are you sure you want to delete this skill?',
                       ),
                       actions: [
                         TextButton(
-                          onPressed: () => Navigator.pop(context, false),
+                          onPressed: () => Navigator.pop(dialogContext, false),
                           child: const Text('Cancel'),
                         ),
                         TextButton(
-                          onPressed: () => Navigator.pop(context, true),
+                          onPressed: () => Navigator.pop(dialogContext, true),
                           child: const Text('Delete'),
                         ),
                       ],
                     ),
                   );
 
+                  if (!mounted) return;
+
                   if (ok == true) {
                     await ref
                         .read(progressItemsProvider(widget.areaId).notifier)
-                        .deleteItem(item['id']);
+                        .deleteItem(item['id'] as int);
                     await ref
                         .read(progressItemsProvider(widget.areaId).notifier)
                         .loadItems();
@@ -204,7 +214,6 @@ class _ProgressItemScreenState extends ConsumerState<ProgressItemScreen> {
             );
           },
         ),
-
         floatingActionButton: TennisBallButton(onPressed: _showAddItemDialog),
       ),
     );
