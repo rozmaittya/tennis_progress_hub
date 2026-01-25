@@ -1,53 +1,55 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:progress_hub_2/database/db_constants.dart';
 import '../utils/edit_item_dialog.dart';
-import '../providers/progress_items_providers.dart';
+import '../providers/skills_providers.dart';
 import '../providers/database_provider.dart';
 import '../providers/mastered_screens_providers.dart';
 import '../providers/goals_providers.dart';
 import '../widgets/tennis_ball_button.dart';
 import '../utils/gradient_background.dart';
+import '../database/db_constants.dart';
 
-class ProgressItemScreen extends ConsumerStatefulWidget {
+class SkillsScreen extends ConsumerStatefulWidget {
   final int areaId;
   final String areaName;
 
-  const ProgressItemScreen({
+  const SkillsScreen({
     super.key,
     required this.areaId,
     required this.areaName,
   });
 
   @override
-  ConsumerState<ProgressItemScreen> createState() => _ProgressItemScreenState();
+  ConsumerState<SkillsScreen> createState() => _SkillsScreenState();
 }
 
-class _ProgressItemScreenState extends ConsumerState<ProgressItemScreen> {
-  Future<void> _toggleItem(int id, bool isChecked) async {
+class _SkillsScreenState extends ConsumerState<SkillsScreen> {
+  Future<void> _toggleSkill(int id, bool isChecked) async {
     await ref
-        .read(progressItemsProvider(widget.areaId).notifier)
-        .toggleItem(id, isChecked);
+        .read(skillsProvider(widget.areaId).notifier)
+        .toggleSkill(id, isChecked);
   }
 
-  Future<void> _editItem(int id, String currentName) async {
+  Future<void> _editSkill(int id, String currentName) async {
     final db = ref.read(databaseProvider).value;
     if (db == null) return;
 
-    await editItemDialog(
+    await editSkillDialog(
       context: context,
       db: db,
-      tableName: 'progress_item',
+      tableName: SkillTable.table,
       id: id,
       currentName: currentName,
       onUpdated: () {
-        ref.read(progressItemsProvider(widget.areaId).notifier).loadItems();
+        ref.read(skillsProvider(widget.areaId).notifier).loadSkills();
         ref.invalidate(goalsProvider);
       },
     );
   }
 
-  Future<void> _showAddItemDialog() async {
-    String itemName = '';
+  Future<void> _showAddSkillDialog() async {
+    String skillName = '';
 
     final result = await showDialog<String>(
       context: context,
@@ -57,7 +59,7 @@ class _ProgressItemScreenState extends ConsumerState<ProgressItemScreen> {
           content: TextField(
             autofocus: true,
             decoration: const InputDecoration(hintText: 'Input new skill name'),
-            onChanged: (value) => itemName = value,
+            onChanged: (value) => skillName = value,
           ),
           actions: [
             TextButton(
@@ -66,8 +68,8 @@ class _ProgressItemScreenState extends ConsumerState<ProgressItemScreen> {
             ),
             TextButton(
               onPressed: () {
-                if (itemName.trim().isNotEmpty) {
-                  Navigator.of(dialogContext).pop(itemName);
+                if (skillName.trim().isNotEmpty) {
+                  Navigator.of(dialogContext).pop(skillName);
                 } else {
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(content: Text('Name should be not empty')),
@@ -85,14 +87,14 @@ class _ProgressItemScreenState extends ConsumerState<ProgressItemScreen> {
 
     if (result != null) {
       await ref
-          .read(progressItemsProvider(widget.areaId).notifier)
-          .addItem(result);
+          .read(skillsProvider(widget.areaId).notifier)
+          .addSkill(result);
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    final items = ref.watch(progressItemsProvider(widget.areaId));
+    final skills = ref.watch(skillsProvider(widget.areaId));
 
     return GradientBackground(
       child: Scaffold(
@@ -109,13 +111,13 @@ class _ProgressItemScreenState extends ConsumerState<ProgressItemScreen> {
           backgroundColor: Colors.transparent,
         ),
         body: ListView.builder(
-          itemCount: items.length,
+          itemCount: skills.length,
           itemBuilder: (itemContext, index) {
-            final item = items[index];
+            final skill = skills[index];
 
             return ListTile(
               title: Text(
-                (item['name'] ?? '').toString(),
+                (skill[SkillTable.name] ?? '').toString(),
                 style: const TextStyle(
                   shadows: [
                     Shadow(
@@ -127,7 +129,7 @@ class _ProgressItemScreenState extends ConsumerState<ProgressItemScreen> {
                 ),
               ),
               trailing: Checkbox(
-                value: item['is_checked'] == 1,
+                value: skill[SkillTable.isChecked] == 1,
                 onChanged: (bool? value) async {
                   if (value == null) return;
 
@@ -156,7 +158,7 @@ class _ProgressItemScreenState extends ConsumerState<ProgressItemScreen> {
                     if (!mounted || ok != true) return;
                   }
 
-                  await _toggleItem(item['id'] as int, value);
+                  await _toggleSkill(skill[SkillTable.id] as int, value);
                   ref.invalidate(masteredSkillsProvider);
                 },
               ),
@@ -173,9 +175,9 @@ class _ProgressItemScreenState extends ConsumerState<ProgressItemScreen> {
                 if (!mounted) return;
 
                 if (result == 'edit') {
-                  await _editItem(
-                    item['id'] as int,
-                    (item['name'] ?? '').toString(),
+                  await _editSkill(
+                    skill[SkillTable.id] as int,
+                    (skill[SkillTable.name] ?? '').toString(),
                   );
                   if (!mounted) return;
                 } else if (result == 'delete') {
@@ -203,18 +205,18 @@ class _ProgressItemScreenState extends ConsumerState<ProgressItemScreen> {
 
                   if (ok == true) {
                     await ref
-                        .read(progressItemsProvider(widget.areaId).notifier)
-                        .deleteItem(item['id'] as int);
+                        .read(skillsProvider(widget.areaId).notifier)
+                        .deleteSkill(skill[SkillTable.id] as int);
                     await ref
-                        .read(progressItemsProvider(widget.areaId).notifier)
-                        .loadItems();
+                        .read(skillsProvider(widget.areaId).notifier)
+                        .loadSkills();
                   }
                 }
               },
             );
           },
         ),
-        floatingActionButton: TennisBallButton(onPressed: _showAddItemDialog),
+        floatingActionButton: TennisBallButton(onPressed: _showAddSkillDialog),
       ),
     );
   }

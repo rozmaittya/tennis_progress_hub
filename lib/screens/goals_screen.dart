@@ -65,7 +65,7 @@ class GoalsScreen extends ConsumerStatefulWidget {
                       subtitle: Padding(
                         padding: const EdgeInsets.only(top: 4),
                         child: Text(
-                          goal['item_name'] ?? '',
+                          goal['skill_name'] ?? '',
                           style: const TextStyle(
                             fontWeight: FontWeight.bold,
                             fontSize: 18,
@@ -100,12 +100,12 @@ class GoalsScreen extends ConsumerStatefulWidget {
 
               switch (selected) {
                 case 'edit':
-                  final itemId = goal['item_id'] as int?;
+                  final skillId = goal['skill_id'] as int?;
                   await showAddEditGoalDialog(
                       context: context,
                       ref: ref,
                       existingGoalId: goalId,
-                      existingItemId: itemId,
+                      existingSkillId: skillId,
                   );
                   if (!context.mounted) return;
                   break;

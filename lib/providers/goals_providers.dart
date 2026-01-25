@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../database.dart';
 import '../providers/database_provider.dart';
+import '../database/db_constants.dart';
 
 final goalsProvider =
 StateNotifierProvider<GoalsNotifier, List<Map<String, dynamic>>>(
@@ -25,32 +26,32 @@ class GoalsNotifier extends StateNotifier<List<Map<String, dynamic>>> {
 Future<void> loadGoals() async {
     if(db == null) return;
 
-    final result = await db!.getGoalsWithAreaItemName();
+    final result = await db!.getGoalsWithAreaSkillName();
     state = result;
 }
 
-Future<void> addGoal(int itemId) async {
+Future<void> addGoal(int skillId) async {
     if(db == null) return;
 
-    await db!.insertElement('goals', {'item_id': itemId, 'is_checked': 0});
+    await db!.insertElement(GoalTable.table, {GoalTable.skillId: skillId, GoalTable.isChecked: 0});
     await loadGoals();
 }
 
-Future<void> updateGoal(int id, int itemId) async {
+Future<void> updateGoal(int id, int skillId) async {
     if(db == null) return;
 
-    await db!.updateGoal(id, itemId);
+    await db!.updateGoal(id, skillId);
 }
 
 Future<void> toggleGoal(int id, bool isChecked) async {
     if(db == null) return;
 
-    await db!.updateChecked('goals', id, isChecked);
+    await db!.updateChecked(GoalTable.table, id, isChecked);
 }
 
 Future<void> deleteGoal(int id) async {
     if(db == null) return;
 
-    await db!.deleteElement('goals', where: 'id = ?', whereArgs: [id],);
+    await db!.deleteElement(GoalTable.table, where: 'id = ?', whereArgs: [id],);
 }
 }

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../database.dart';
 
-Future<void> editItemDialog({
+Future<void> editSkillDialog({
   required BuildContext context,
   required AppDatabase db,
   required String tableName,

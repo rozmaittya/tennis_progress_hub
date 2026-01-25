@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/services.dart';
-import '../providers/progress_items_providers.dart';
+import '../providers/skills_providers.dart';
 import '../providers/tips_providers.dart';
-import '../providers/progress_areas_providers.dart';
+import '../providers/skill_areas_providers.dart';
 
 class HomeContentScreen extends ConsumerWidget {
   const HomeContentScreen({super.key});
@@ -92,8 +92,8 @@ class HomeContentScreen extends ConsumerWidget {
                       }
 
                       await ref
-                          .read(progressItemsProvider(areaId).notifier)
-                          .addItem(tip.text);
+                          .read(skillsProvider(areaId).notifier)
+                          .addSkill(tip.text);
 
                       if (!context.mounted) return;
 

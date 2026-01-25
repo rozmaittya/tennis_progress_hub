@@ -41,38 +41,37 @@ class AppDatabase {
   //Table of skills areas (e.g., Forehand, Serve)
   Future<void> _onCreate(Database db, int version) async {
     await db.execute('''
-      CREATE TABLE progress_area (
+      CREATE TABLE skill_area (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
-        name TEXT NOT NULL,
-        is_checked INTEGER NOT NULL DEFAULT 0        
+        name TEXT NOT NULL
         )
     ''');
     //Table of tennis skills (e.g., athletic position, to bow shoulders)
     await db.execute('''
-      CREATE TABLE progress_item (
+      CREATE TABLE skill (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       area_id INTEGER NOT NULL,
       name TEXT NOT NULL,
       is_checked INTEGER NOT NULL DEFAULT 0,
-      FOREIGN KEY (area_id) REFERENCES progress_area(id)
+      FOREIGN KEY (area_id) REFERENCES skill_area(id)
           ON DELETE CASCADE
           ON UPDATE CASCADE
       )
     ''');
     //Table of training/game goals (user should selects 1-3 skills)
     await db.execute('''
-      CREATE TABLE goals (
+      CREATE TABLE goal (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
-      item_id INTEGER NOT NULL,
+      skill_id INTEGER NOT NULL,
       is_checked INTEGER NOT NULL DEFAULT 0,
-      FOREIGN KEY (item_id) REFERENCES progress_item(id)
+      FOREIGN KEY (skill_id) REFERENCES skill(id)
           ON DELETE CASCADE
           ON UPDATE CASCADE 
       )
       ''');
-    //Base progress area
+    //Base skill areas
     await db.execute('''
-      INSERT INTO progress_area (name)
+      INSERT INTO skill_area (name)
       VALUES ('Forehand'), ('Backhand'), ('Serve'), ('Return'), ('Volley'), ('Overhead'), ('Slice'), ('Drop Shot'), ('Lob'), ('Movement'), ('Tactics'), ('Mindset')
     ''');
   }
@@ -115,10 +114,10 @@ class AppDatabase {
   }
 
   //goals table update function
-  Future<void> updateGoal(int id, int itemId) async {
+  Future<void> updateGoal(int id, int skillId) async {
     await _db.update(
-      'goals',
-      {'item_id': itemId},
+      'goal',
+      {'skill_id': skillId},
       where: 'id = ?',
       whereArgs: [id],
     );
@@ -140,39 +139,39 @@ class AppDatabase {
   }
 
   //choosing all learned skills function
-  Future<List<Map<String, dynamic>>> getCheckedItemsWithAreaName() async {
+  Future<List<Map<String, dynamic>>> getCheckedSkillsWithAreaName() async {
     final result = await _db.rawQuery('''
       SELECT
-        progress_item.id AS item_id,
-        progress_item.name AS item_name,
-        progress_item.area_id,
-        progress_area.name AS area_name,
-        progress_item.is_checked
-       FROM progress_item
-       INNER JOIN progress_area
-         ON progress_item.area_id = progress_area.id
-       WHERE progress_item.is_checked = 1  
+        skill.id AS skill_id,
+        skill.name AS skill_name,
+        skill.area_id,
+        skill_area.name AS area_name,
+        skill.is_checked
+       FROM skill
+       INNER JOIN skill_area
+         ON skill.area_id = skill_area.id
+       WHERE skill.is_checked = 1  
       ''');
 
     return result;
   }
 
   //choosing training/game goals
-  Future<List<Map<String, dynamic>>> getGoalsWithAreaItemName() async {
+  Future<List<Map<String, dynamic>>> getGoalsWithAreaSkillName() async {
     final result = await _db.rawQuery('''
     SELECT 
-      goals.id,
-      progress_area.name AS area_name,
-      progress_item.name AS item_name,
-      goals.item_id,
-      progress_item.is_checked AS item_is_checked,
-      goals.is_checked
-    FROM goals
-    INNER JOIN progress_item
-      ON goals.item_id = progress_item.id
-    INNER JOIN progress_area
-      ON progress_item.area_id = progress_area.id
-    WHERE goals.is_checked = 0 AND progress_item.is_checked = 0
+      goal.id,
+      skill_area.name AS area_name,
+      skill.name AS skill_name,
+      goal.skill_id,
+      skill.is_checked,
+      goal.is_checked
+    FROM goal
+    INNER JOIN skill
+      ON goal.skill_id = skill.id
+    INNER JOIN skill_area
+      ON skill.area_id = skill_area.id
+    WHERE goal.is_checked = 0 AND skill.is_checked = 0
     ''');
 
     return result;
@@ -181,14 +180,14 @@ class AppDatabase {
   Future<List<Map<String, dynamic>>> getMasteredSkills() async {
     final result = await _db.rawQuery('''
     SELECT
-      progress_item.id,
-      progress_area.name AS area_name,
-      progress_item.name AS item_name,
-      progress_item.is_checked
-    FROM progress_item
-    INNER JOIN progress_area
-      ON progress_item.area_id = progress_area.id
-    WHERE progress_item.is_checked = 1
+      skill.id,
+      skill_area.name AS area_name,
+      skill.name AS skill_name,
+      skill.is_checked
+    FROM skill
+    INNER JOIN skill_area
+      ON skill.area_id = skill_area.id
+    WHERE skill.is_checked = 1
     ''');
 
     return result;

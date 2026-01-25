@@ -1,7 +1,8 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/material.dart';
-import 'package:progress_hub_2/providers/progress_items_providers.dart';
+import 'package:progress_hub_2/providers/skills_providers.dart';
 import '../providers/mastered_screens_providers.dart';
+import '../database/db_constants.dart';
 
 class MasteredSkillsScreen extends ConsumerStatefulWidget {
   const MasteredSkillsScreen({super.key});
@@ -28,7 +29,7 @@ class _MasteredSkillsScreenState extends ConsumerState<MasteredSkillsScreen> {
               style: const TextStyle(fontSize: 13, color: Colors.black54),
             ),
             subtitle: Text(
-              masteredSkill['item_name'],
+              masteredSkill['skill_name'],
               style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
             ),
             trailing: Checkbox(
@@ -65,7 +66,7 @@ class _MasteredSkillsScreenState extends ConsumerState<MasteredSkillsScreen> {
                     masteredSkill['id'] as int,
                     false,
                   );
-                  ref.invalidate(progressItemsProvider);
+                  ref.invalidate(skillsProvider);
                 }
               },
             ),
