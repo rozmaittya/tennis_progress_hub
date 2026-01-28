@@ -2,12 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:progress_hub_2/providers/goals_providers.dart';
 import '../providers/database_provider.dart';
+import '../database/db_constants.dart';
 
 Future<void> showAddEditGoalDialog({
   required BuildContext context,
   required WidgetRef ref,
   int? existingGoalId,
-  int? existingItemId,
+  int? existingSkillId,
 }) async {
 
   final db = ref.read(databaseProvider).value;
@@ -15,28 +16,28 @@ Future<void> showAddEditGoalDialog({
 
   // Load areas
   final List<Map<String, dynamic>> areas =
-  (await db.getAll('progress_area')).cast<Map<String, dynamic>>();
+  (await db.getAll(SkillAreaTable.table)).cast<Map<String, dynamic>>();
 
   int? selectedAreaId;
-  int? selectedItemId;
+  int? selectedSkillId;
 
-  List<Map<String, dynamic>> itemsInSelectedArea = [];
+  List<Map<String, dynamic>> skillsInSelectedArea = [];
 
-  if (existingItemId != null) {
+  if (existingSkillId != null) {
     final List<Map<String, dynamic>> itemRows = (await db.getAll(
-      'progress_item',
+      SkillTable.table,
       where: 'id = ?',
-      whereArgs: [existingItemId],
+      whereArgs: [existingSkillId],
     ))
         .cast<Map<String, dynamic>>();
 
     if (itemRows.isNotEmpty) {
       final item = itemRows.first;
-      selectedItemId = item['id'] as int;
+      selectedSkillId = item['id'] as int;
       selectedAreaId = item['area_id'] as int;
 
-      itemsInSelectedArea = (await db.getAll(
-        'progress_item',
+      skillsInSelectedArea = (await db.getAll(
+        SkillTable.table,
         where: 'area_id = ?',
         whereArgs: [selectedAreaId],
       ))
@@ -70,7 +71,7 @@ Future<void> showAddEditGoalDialog({
                     if (areaId == null) return;
 
                     final items = (await db.getAll(
-                      'progress_item',
+                      SkillTable.table,
                       where: 'area_id = ? AND is_checked = ?',
                       whereArgs: [areaId, 0],
                     ))
@@ -78,8 +79,8 @@ Future<void> showAddEditGoalDialog({
 
                     setState(() {
                       selectedAreaId = areaId;
-                      selectedItemId = null;
-                      itemsInSelectedArea = items;
+                      selectedSkillId = null;
+                      skillsInSelectedArea = items;
                     });
                   },
                 ),
@@ -89,8 +90,8 @@ Future<void> showAddEditGoalDialog({
                 DropdownButton<int>(
                   isExpanded: true,
                   hint: const Text('Select skill'),
-                  value: selectedItemId,
-                  items: itemsInSelectedArea.map((item) {
+                  value: selectedSkillId,
+                  items: skillsInSelectedArea.map((item) {
                     final id = item['id'] as int;
                     final name = (item['name'] ?? '').toString();
                     return DropdownMenuItem<int>(
@@ -100,7 +101,7 @@ Future<void> showAddEditGoalDialog({
                   }).toList(),
                   onChanged: (itemId) {
                     setState(() {
-                      selectedItemId = itemId;
+                      selectedSkillId = itemId;
                     });
                   },
                 ),
@@ -113,13 +114,13 @@ Future<void> showAddEditGoalDialog({
               ),
               TextButton(
                 onPressed: () async {
-                  if (selectedItemId != null) {
+                  if (selectedSkillId != null) {
                     final goalsNotifier = ref.read(goalsProvider.notifier);
 
                     if (existingGoalId == null) {
-                      await goalsNotifier.addGoal(selectedItemId!);
+                      await goalsNotifier.addGoal(selectedSkillId!);
                     } else {
-                      await goalsNotifier.updateGoal(existingGoalId, selectedItemId!);
+                      await goalsNotifier.updateGoal(existingGoalId, selectedSkillId!);
                     }
 
                     await goalsNotifier.loadGoals();

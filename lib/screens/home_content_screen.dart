@@ -1,15 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/services.dart';
-import '../providers/progress_items_providers.dart';
+import '../providers/skills_providers.dart';
 import '../providers/tips_providers.dart';
-import '../providers/progress_areas_providers.dart';
+import '../providers/skill_areas_providers.dart';
 
 class HomeContentScreen extends ConsumerWidget {
   const HomeContentScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final areas = ref.watch(areasProvider);
     final tip = ref.watch(tipProvider);
 
     return ListView(
@@ -78,7 +79,7 @@ class HomeContentScreen extends ConsumerWidget {
                         return;
                       }
 
-                      final areaId = ref.read(areaIdByNameProvider(tip.area));
+                      final areaId = await ref.read(areaIdByNameProvider(tip.area));
 
                       if (areaId == null) {
                         ScaffoldMessenger.of(context).showSnackBar(
@@ -92,8 +93,8 @@ class HomeContentScreen extends ConsumerWidget {
                       }
 
                       await ref
-                          .read(progressItemsProvider(areaId).notifier)
-                          .addItem(tip.text);
+                          .read(skillsProvider(areaId).notifier)
+                          .addSkill(tip.text);
 
                       if (!context.mounted) return;
 

@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:progress_hub_2/providers/goals_providers.dart';
-import '../providers/progress_areas_providers.dart';
-import '../screens/progress_item_screen.dart';
+import '../providers/skill_areas_providers.dart';
+import '../screens/skills_screen.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../widgets/tennis_ball_button.dart';
 import '../providers/mastered_screens_providers.dart';
+import '../database/db_constants.dart';
 
 class ProgressAreasScreen extends ConsumerStatefulWidget {
   const ProgressAreasScreen({super.key});
@@ -50,7 +51,7 @@ class _ProgressAreasScreenState extends ConsumerState<ProgressAreasScreen> {
       },
     ).then((result) async {
       if (result != null && result is String) {
-        await ref.read(progressAreasProvider.notifier).editArea(id, result);
+        await ref.read(areasProvider.notifier).editArea(id, result);
         ref.invalidate(masteredSkillsProvider);
         ref.invalidate(goalsProvider);
 
@@ -58,8 +59,8 @@ class _ProgressAreasScreenState extends ConsumerState<ProgressAreasScreen> {
     });
   }
 
-  Future<void> _showAddItemDialog() async {
-    String itemName = '';
+  Future<void> _showAddSkillDialog() async {
+    String skillName = '';
     await showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -72,7 +73,7 @@ class _ProgressAreasScreenState extends ConsumerState<ProgressAreasScreen> {
               hintText: 'Input progress area name',
             ),
             onChanged: (value) {
-              itemName = value;
+              skillName = value;
             },
           ),
           actions: [
@@ -85,10 +86,10 @@ class _ProgressAreasScreenState extends ConsumerState<ProgressAreasScreen> {
 
             TextButton(
               onPressed: () {
-                if (itemName
+                if (skillName
                     .trim()
                     .isNotEmpty) {
-                  Navigator.of(context).pop(itemName);
+                  Navigator.of(context).pop(skillName);
                 } else {
                   ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(content: Text('Name can\'t be empty')),
@@ -103,25 +104,25 @@ class _ProgressAreasScreenState extends ConsumerState<ProgressAreasScreen> {
       },
     ).then((result) async {
       if (result != null && result is String) {
-        await ref.read(progressAreasProvider.notifier).addArea(result);
+        await ref.read(areasProvider.notifier).addArea(result);
       }
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    final items = ref.watch(progressAreasProvider);
+    final skills = ref.watch(areasProvider);
 
      return  Scaffold(
        backgroundColor: Colors.transparent,
        body:
        ListView.builder(
-        itemCount: items.length,
+        itemCount: skills.length,
         itemBuilder: (context, index) {
-          final item = items[index];
+          final skill = skills[index];
           return ListTile(
             leading: Icon(Icons.sports_tennis),
-            title: Text(item['name'], style:
+            title: Text(skill[SkillTable.name], style:
               TextStyle(
                 fontWeight: FontWeight.bold,
               ),
@@ -131,21 +132,21 @@ class _ProgressAreasScreenState extends ConsumerState<ProgressAreasScreen> {
                 context,
                 MaterialPageRoute(
                   builder: (context) =>
-                      ProgressItemScreen(
-                        areaId: item['id'],
-                        areaName: item['name'],
+                      SkillsScreen(
+                        areaId: skill[SkillTable.id],
+                        areaName: skill[SkillTable.name],
                       ),
                 ),
               );
             },
             onLongPress: () =>
-                _editItem(item['id'], item['name']),
+                _editItem(skill[SkillTable.id], skill[SkillTable.name]),
           );
         },
       ),
 
        floatingActionButton: TennisBallButton(
-        onPressed: _showAddItemDialog,
+        onPressed: _showAddSkillDialog,
        )
        );
   }

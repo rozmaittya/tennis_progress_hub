@@ -4,7 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../providers/providers.dart';
 import '../screens/goals_screen.dart';
 import '../screens/screen_data.dart';
-import '../screens/progress_areas_screen.dart';
+import '../screens/skill_areas_screen.dart';
 import '../screens/mastered_skills_screen.dart';
 import '../screens/home_content_screen.dart';
 import '../widgets/help_dialog.dart';

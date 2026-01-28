@@ -1,23 +1,24 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../database.dart';
+import '../database/database.dart';
 import '../providers/database_provider.dart';
+import '../database/db_constants.dart';
 
-final progressAreasProvider =
-    StateNotifierProvider<ProgressAreasNotifier, List<Map<String, dynamic>>>((
+final areasProvider =
+    StateNotifierProvider<AreasNotifier, List<Map<String, dynamic>>>((
       ref,
     ) {
       final dbAsync = ref.watch(databaseProvider);
 
       return dbAsync.maybeWhen(
-        data: (db) => ProgressAreasNotifier(db),
-        orElse: () => ProgressAreasNotifier(null),
+        data: (db) => AreasNotifier(db),
+        orElse: () => AreasNotifier(null),
       );
     });
 
-class ProgressAreasNotifier extends StateNotifier<List<Map<String, dynamic>>> {
+class AreasNotifier extends StateNotifier<List<Map<String, dynamic>>> {
   final AppDatabase? db;
 
-  ProgressAreasNotifier(this.db) : super([]) {
+  AreasNotifier(this.db) : super([]) {
     if (db != null) {
       loadAreas();
     }
@@ -26,36 +27,36 @@ class ProgressAreasNotifier extends StateNotifier<List<Map<String, dynamic>>> {
   Future<void> loadAreas() async {
     if (db == null) return;
 
-    final areas = await db!.getAll('progress_area');
+    final areas = await db!.getAll(SkillAreaTable.table);
     state = areas;
   }
 
   Future<void> addArea(String name) async {
     if (db == null) return;
-    await db?.insertElement('progress_area', {'name': name, 'is_checked': 0});
+    await db?.insertElement(SkillAreaTable.table, {SkillAreaTable.name: name});
     await loadAreas();
   }
 
   Future<void> editArea(int id, String newName) async {
     if (db == null) return;
 
-    await db?.updateName('progress_area', id, newName);
+    await db?.updateName(SkillAreaTable.table, id, newName);
     await loadAreas();
   }
 
   Future<void> toggleArea(int id, bool isChecked) async {
     if (db == null) return;
 
-    await db?.updateChecked('progress_area', id, isChecked);
+    await db?.updateChecked(SkillAreaTable.table, id, isChecked);
     await loadAreas();
   }
 }
 
 final areaIdByNameProvider = Provider.family<int?, String>((ref, areaName) {
-  final areas = ref.watch(progressAreasProvider);
+  final areas = ref.watch(areasProvider);
 
   for (final a in areas) {
-    if (a['name'] == areaName) return a['id'] as int;
+    if (a[SkillAreaTable.name] == areaName) return a[SkillAreaTable.id] as int;
   }
   return null;
 });

@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../database.dart';
+import '../database/database.dart';
 import '../providers/database_provider.dart';
+import '../database/db_constants.dart';
 
 final masteredSkillsProvider =
 StateNotifierProvider<MasteredSkillsNotifier, List<Map<String, dynamic>>>(
@@ -33,7 +34,7 @@ class MasteredSkillsNotifier extends StateNotifier<List<Map<String, dynamic>>> {
   Future<void> toggleMasteredSkill(int id, bool isChecked) async {
     if (db == null) return;
 
-    await db!.updateChecked('progress_item', id, isChecked);
+    await db!.updateChecked(SkillTable.table, id, isChecked);
     await loadMasteredSkills();
   }
 }
