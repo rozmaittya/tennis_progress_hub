@@ -1,5 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../database.dart';
+import '../database/database.dart';
 
 final databaseProvider = FutureProvider<AppDatabase>((ref) async {
   final db = AppDatabase();

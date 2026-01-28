@@ -1,5 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../database.dart';
+import '../database/database.dart';
 import '../providers/database_provider.dart';
 import '../database/db_constants.dart';
 
