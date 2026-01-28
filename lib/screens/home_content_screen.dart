@@ -10,6 +10,7 @@ class HomeContentScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final areas = ref.watch(areasProvider);
     final tip = ref.watch(tipProvider);
 
     return ListView(
@@ -78,7 +79,7 @@ class HomeContentScreen extends ConsumerWidget {
                         return;
                       }
 
-                      final areaId = ref.read(areaIdByNameProvider(tip.area));
+                      final areaId = await ref.read(areaIdByNameProvider(tip.area));
 
                       if (areaId == null) {
                         ScaffoldMessenger.of(context).showSnackBar(

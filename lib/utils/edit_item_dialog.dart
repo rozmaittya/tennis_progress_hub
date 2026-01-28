@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../database.dart';
+import '../database/database.dart';
 
 Future<void> editSkillDialog({
   required BuildContext context,
